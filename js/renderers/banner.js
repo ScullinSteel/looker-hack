@@ -9,7 +9,7 @@ function renderOne(data) {
 
   Object.keys(data).forEach(function(key) {
     var label = util.formatLabel(key);
-    str += `${label}\n${data[key]}\n`;
+    str += label + '\n' + data[key] + '\n';
   });
 
   return str;

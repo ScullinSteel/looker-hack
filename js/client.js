@@ -11,14 +11,14 @@ function Client(host) {
   var clientId = (rc && rc['login']) || process.env.LOOKER_CLIENT;
   var secret = (rc && rc['password']) || process.env.LOOKER_SECRET;
 
-  var apiBase = `https://${apiHost}/api/3.0`;
+  var apiBase = 'https://' + apiHost + '/api/3.0';
 
   return {
     login: function() {
       var client = this;
 
       debug('Requesting login');
-      return fetch(`${apiBase}/login?client_id=${clientId}&client_secret=${secret}`, {
+      return fetch(apiBase + '/login?client_id=' + clientId + '&client_secret=' + secret, {
         method: 'POST'
       })
       .then(function(res) {
@@ -38,45 +38,45 @@ function Client(host) {
     headers: function() {
       var client = this;
       return {
-        Authorization: `token ${client.token}`
+        Authorization: 'token ' + client.token
       };
     },
 
     runQuery: function(queryId) {
       var client = this;
-      debug(`Running query ${queryId}`);
+      debug('Running query ' + queryId);
 
-      return fetch(`${apiBase}/queries/${queryId}/run/json?apply_formatting=true&cache=true`, {
+      return fetch(apiBase + '/queries/' + queryId + '/run/json?apply_formatting=true&cache=true', {
         headers: client.headers()
       })
       .then(function (res) {
-        debug(`Query run ${queryId}`);
+        debug('Query run ' + queryId);
         return res.json();
       });
     },
 
     look: function(lookId) {
       var client = this;
-      debug(`Running look ${lookId}`);
+      debug('Running look ' + lookId);
 
-      return fetch(`${apiBase}/looks/${lookId}?cache=true`, {
+      return fetch(apiBase + '/looks/' + lookId + '?cache=true', {
         headers: client.headers()
       })
       .then(function (res) {
-        debug(`Look run ${lookId}`);
+        debug('Look run ' + lookId);
         return res.json();
       });
     },
 
     runLook: function(lookId) {
       var client = this;
-      debug(`Running look ${lookId}`);
+      debug('Running look ' + lookId);
 
-      return fetch(`${apiBase}/looks/${lookId}/run/json?cache=true`, {
+      return fetch(apiBase + '/looks/' + lookId + '/run/json?apply_formatting=true&cache=true', {
         headers: client.headers()
       })
       .then(function (res) {
-        debug(`Look run ${lookId}`);
+        debug('Look run ' + lookId);
         return res.json();
       });
     }

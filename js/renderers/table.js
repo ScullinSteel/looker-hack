@@ -28,7 +28,7 @@ function render(look, data, done) {
   }
 
   keys.forEach(function (key) {
-    headers[key] = util.formatLabel(key);
+    headers[key] = util.formatLabelShort(key);
     widths[key] = headers[key].length;
   });
 

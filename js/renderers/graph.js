@@ -15,7 +15,8 @@ function render(look, data, done) {
   data.forEach(function(row) {
     var values = [];
     keys.forEach(function(key) {
-      values.push(row[key]);
+      var value = row[key].replace(/[\$\,]/g, '');
+      values.push(value);
     });
     plotData += values.join('\t') + '\n';
   });
