@@ -1,32 +1,15 @@
 var Client = require('./client');
 var GetOpt = require('node-getopt');
 var debug = require('debug')('looker-hack:main');
+var fs = require('fs');
 var renderers = {
   banner: require('./renderers/banner'),
+  file: require('./renderers/file'),
   graph: require('./renderers/graph'),
   table: require('./renderers/table')
 };
 
-var config = {
-  host: 'localhost.looker.com:19999',
-  pages: [
-    {
-      lookId: 1,
-      renderer: 'banner',
-      duration: 5
-    },
-    {
-      lookId: 4,
-      renderer: 'graph',
-      duration: 5
-    },
-    {
-      lookId: 6,
-      renderer: 'table',
-      duration: 5
-    }
-  ]
-};
+var config = {};
 
 var cli;
 var client;
@@ -43,21 +26,25 @@ function render() {
     }
   }
 
-  debug('getting look', page.lookId);
-  client.look(page.lookId).then(function(look) {
-    debug('running look');
-    client.runLook(page.lookId)
-    .then(function(data) {
-      debug('look complete');
-      renderers[page.renderer](look, data, done);
+  if (page.lookId) {
+    debug('getting look', page.lookId);
+    client.look(page.lookId).then(function(look) {
+      debug('running look');
+      client.runLook(page.lookId)
+      .then(function(data) {
+        debug('look complete');
+        renderers[page.renderer](look, data, done);
+      })
+      .catch(function(err) {
+        renderers.banner(look, err, done);
+      });
     })
     .catch(function(err) {
-      renderers.banner(look, err, done);
+      renderers.banner(null, err, done);
     });
-  })
-  .catch(function(err) {
-    renderers.banner(null, err, done);
-  });
+  } else {
+    renderers[page.renderer](page.data, done);
+  }
 }
 
 function main() {
@@ -72,10 +59,16 @@ function main() {
     curPage = parseInt(cli.options.page, 10);
   }
 
-  client = new Client(config.host);
+  fs.readFile('config.json', function(err, data) {
+    if (err) {
+      throw err;
+    }
 
-  client.login().then(render).catch(function(err) {
-    console.error(err);
+    config = JSON.parse(data);
+
+    client = new Client(config.host);
+
+    render();
   });
 }
 
