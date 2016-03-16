@@ -56,7 +56,7 @@ function Client(host) {
       };
     },
 
-    checkLogin() {
+    checkLogin: function() {
       var client = this;
 
       if (client.token) {
