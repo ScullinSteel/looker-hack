@@ -17,26 +17,25 @@ function renderOne(data) {
 
 function render(look, data) {
   debug('rendering');
-  var deferred = Promise.defer();
-  var str = '';
-  if (isArray(data)) {
-    data.forEach(function (val) {
-      str += renderOne(val);
-    });
-  } else {
-    str += renderOne(data);
-  }
-  debug('rendering', str);
-
-  figlet.text(str, { }, function(err, data) {
-    if (err) {
-      return deferred.reject(err);
+  return new Promise(function(resolve, reject) {
+    var str = '';
+    if (isArray(data)) {
+      data.forEach(function (val) {
+        str += renderOne(val);
+      });
+    } else {
+      str += renderOne(data);
     }
-    util.renderPadded(data);
-    deferred.resolve();
-  });
+    debug('rendering', str);
 
-  return deferred.promise;
+    figlet.text(str, { }, function(err, data) {
+      if (err) {
+        return reject(err);
+      }
+      util.renderPadded(data);
+      resolve();
+    });
+  });
 }
 
 module.exports = render;

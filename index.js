@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-var main = require("./js/main");
-var util = require("util");
+require('es6-promise').polyfill();
+
+var main = require('./js/main');
+var util = require('util');
 
 main(util.argv);

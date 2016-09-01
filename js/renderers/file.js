@@ -2,21 +2,19 @@ var fs = require('fs');
 var util = require('./util');
 
 function render(look, filename) {
-  var deferred = Promise.defer();
+  return new Promise(function(resolve, reject) {
+    fs.readFile(filename, function(err, data) {
+      if (err) {
+        return reject(err);
+      }
 
-  fs.readFile(filename, function(err, data) {
-    if (err) {
-      return deferred.reject(err);
-    }
+      var msg = err ? err : data.toString();
 
-    var msg = err ? err : data.toString();
+      util.renderPadded(msg);
 
-    util.renderPadded(msg);
-
-    deferred.resolve();
+      resolve();
+    });
   });
-
-  return deferred.promise;
 }
 
 module.exports = render;
