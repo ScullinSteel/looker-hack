@@ -33,17 +33,17 @@ function render() {
       client.runLook(page.lookId)
       .then(function(data) {
         debug('look complete');
-        renderers[page.renderer](look, data, done);
+        renderers[page.renderer](look, data).then(done);
       })
       .catch(function(err) {
-        renderers.banner(look, err, done);
+        renderers.banner(look, err).then(done);
       });
     })
     .catch(function(err) {
-      renderers.banner(null, err, done);
+      renderers.banner(null, err).then(done);
     });
   } else {
-    renderers[page.renderer](page.data, done);
+    renderers[page.renderer](null, page.data).then(done);
   }
 }
 

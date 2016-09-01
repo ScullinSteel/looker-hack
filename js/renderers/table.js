@@ -3,11 +3,11 @@ var util = require('./util');
 var SPACE = '                                                                                ';
 var LINE = '--------------------------------------------------------------------------------';
 
-function render(look, data, done) {
+function render(look, data) {
   debug('rendering');
 
   if (!data.length) {
-    return;
+    return Promise.reject('No data');
   }
 
   var str = util.formatCenter(look.title);
@@ -63,7 +63,8 @@ function render(look, data, done) {
   divider();
 
   util.renderPadded(str);
-  done();
+
+  return Promise.resolve();
 }
 
 module.exports = render;

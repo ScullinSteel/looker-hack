@@ -15,8 +15,9 @@ function renderOne(data) {
   return str;
 }
 
-function render(look, data, done) {
+function render(look, data) {
   debug('rendering');
+  var deferred = Promise.defer();
   var str = '';
   if (isArray(data)) {
     data.forEach(function (val) {
@@ -28,9 +29,14 @@ function render(look, data, done) {
   debug('rendering', str);
 
   figlet.text(str, { }, function(err, data) {
+    if (err) {
+      return deferred.reject(err);
+    }
     util.renderPadded(data);
-    done();
+    deferred.resolve();
   });
+
+  return deferred.promise;
 }
 
 module.exports = render;
