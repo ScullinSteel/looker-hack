@@ -1,6 +1,7 @@
 var fetch = require('node-fetch');
 var debug = require('debug')('looker-hack:client');
 var netrc = require('netrc');
+var Swagger = require('swagger-client');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = 0;
 
@@ -12,11 +13,12 @@ function Client(host) {
   var secret = (rc && rc['password']) || process.env.LOOKER_SECRET;
 
   var apiBase = 'https://' + apiHost + '/api/3.0';
+  var token;
+  var loginTimer;
+  var client;
 
   return {
     login: function() {
-      var client = this;
-
       debug('Requesting login');
       return fetch(apiBase + '/login?client_id=' + clientId + '&client_secret=' + secret, {
         method: 'POST'
@@ -25,21 +27,29 @@ function Client(host) {
         return res.json();
       })
       .then(function(json) {
-        client.token = null;
+        token = null;
 
         if (json.access_token) {
           debug('Login succeeded');
-          client.token = json.access_token;
+          token = json.access_token;
 
-          if (client.loginTimer) {
-            clearTimeout(client.loginTimer);
+          client = new Swagger({
+            url: apiBase + '/swagger.json',
+            usePromise: true,
+            authorizations: {
+              token: new Swagger.ApiKeyAuthorization('Authorization', 'token ' + token, 'header')
+            }
+          });
+
+          if (loginTimer) {
+            clearTimeout(loginTimer);
           }
 
           if (json.expires_in) {
             debug('Login expires in ' + json.expires_in);
 
-            client.loginTimer = setTimeout(function() {
-              client.token = null;
+            loginTimer = setTimeout(function() {
+              token = null;
             }, json.expires_in * 500);
           }
         } else {
@@ -49,63 +59,12 @@ function Client(host) {
       });
     },
 
-    headers: function() {
-      var client = this;
-      return {
-        Authorization: 'token ' + client.token
-      };
-    },
-
     checkLogin: function() {
-      var client = this;
-
-      if (client.token) {
+      if (token) {
         return Promise.resolve(client);
       } else {
-        return client.login();
+        return this.login();
       }
-    },
-
-    runQuery: function(queryId) {
-      return this.checkLogin().then(function(client) {
-        debug('Running query ' + queryId);
-
-        return fetch(apiBase + '/queries/' + queryId + '/run/json?apply_formatting=true&cache=true', {
-          headers: client.headers()
-        })
-        .then(function (res) {
-          debug('Query run ' + queryId);
-          return res.json();
-        });
-      });
-    },
-
-    look: function(lookId) {
-      return this.checkLogin().then(function(client) {
-        debug('Running look ' + lookId);
-
-        return fetch(apiBase + '/looks/' + lookId + '?cache=true', {
-          headers: client.headers()
-        })
-        .then(function (res) {
-          debug('Got look ' + lookId);
-          return res.json();
-        });
-      });
-    },
-
-    runLook: function(lookId) {
-      return this.checkLogin().then(function(client) {
-        debug('Running look ' + lookId);
-
-        return fetch(apiBase + '/looks/' + lookId + '/run/json?apply_formatting=true&cache=true', {
-          headers: client.headers()
-        })
-        .then(function (res) {
-          debug('Ran look ' + lookId);
-          return res.json();
-        });
-      });
     }
   };
 }

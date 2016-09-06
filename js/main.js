@@ -28,15 +28,15 @@ function render() {
 
   if (page.lookId) {
     debug('getting look', page.lookId);
-    client.look(page.lookId).then(function(look) {
-      debug('running look');
-      client.runLook(page.lookId)
-      .then(function(data) {
-        debug('look complete');
-        renderers[page.renderer](look, data).then(done);
-      })
-      .catch(function(err) {
-        renderers.banner(look, err).then(done);
+    client.checkLogin().then(function(client) {
+      client.Look.look({look_id: page.lookId}).then(function(result) {
+        var look = result.obj;
+        debug('running look');
+        client.Look.run_look({look_id: page.lookId, result_format: 'json', apply_formatting: true}).then(function(result) {
+          var data = result.obj;
+          debug('look complete');
+          renderers[page.renderer](look, data).then(done);
+        });
       });
     })
     .catch(function(err) {

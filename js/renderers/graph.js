@@ -29,7 +29,7 @@ function render(look, data) {
     plotData += values.join('\t') + '\n';
   });
 
-  // debug(plotData);
+  debug(plotData);
 
   var s = new stream.Readable();
   s.push(plotData);
