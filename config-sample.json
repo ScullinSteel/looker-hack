@@ -1,0 +1,24 @@
+{
+  "host": "self-signed.looker.com:19999",
+  "pages": [
+    {
+      "renderer": "file",
+      "data": "./data/looker.txt"
+    },
+    {
+      "lookId": 39,
+      "renderer": "banner",
+      "duration": 5
+    },
+    {
+      "lookId": 42,
+      "renderer": "graph",
+      "duration": 5
+    },
+    {
+      "lookId": 44,
+      "renderer": "table",
+      "duration": 5
+    }
+  ]
+}
