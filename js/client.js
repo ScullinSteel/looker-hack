@@ -1,3 +1,20 @@
+/*
+ * A simple node client for the Looker API.
+ *
+ * Usage:
+ *
+ * var Client = require('./client');
+ * var client = new Client('you-host.looker.com:9999');
+ *
+ * client.checkLogin().then(function(api) {
+ *   api.Look.look({look_id: 1}).then(function(result) {
+ *     var look = result.obj;
+ *     ...
+ *   });
+ * });
+ *
+ */
+
 var fetch = require('node-fetch');
 var debug = require('debug')('looker-hack:client');
 var netrc = require('netrc');
