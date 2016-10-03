@@ -28,11 +28,11 @@ function render() {
 
   if (page.lookId) {
     debug('getting look', page.lookId);
-    client.checkLogin().then(function(client) {
-      client.Look.look({look_id: page.lookId}).then(function(result) {
+    client.checkLogin().then(function(api) {
+      api.Look.look({look_id: page.lookId}).then(function(result) {
         var look = result.obj;
         debug('running look');
-        client.Look.run_look({look_id: page.lookId, result_format: 'json', apply_formatting: true}).then(function(result) {
+        api.Look.run_look({look_id: page.lookId, result_format: 'json', apply_formatting: true}).then(function(result) {
           var data = result.obj;
           debug('look complete');
           renderers[page.renderer](look, data).then(done);

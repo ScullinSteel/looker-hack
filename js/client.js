@@ -15,7 +15,7 @@ function Client(host) {
   var apiBase = 'https://' + apiHost + '/api/3.0';
   var token;
   var loginTimer;
-  var client;
+  var api;
 
   return {
     login: function() {
@@ -33,7 +33,7 @@ function Client(host) {
           debug('Login succeeded');
           token = json.access_token;
 
-          client = new Swagger({
+          api = new Swagger({
             url: apiBase + '/swagger.json',
             usePromise: true,
             authorizations: {
@@ -55,19 +55,18 @@ function Client(host) {
         } else {
           throw new Error('login failed', json);
         }
-        return client;
+        return api;
       });
     },
 
     checkLogin: function() {
       if (token) {
-        return Promise.resolve(client);
+        return Promise.resolve(api);
       } else {
         return this.login();
       }
     }
   };
 }
-
 
 module.exports = Client;
